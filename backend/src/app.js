@@ -20,9 +20,9 @@ connectDB();
 app.use(express.json());
 
 // Use the income routes (all routes under /income)
-app.use('/income', incomeRoutes);
-app.use('/debt', debtRoutes);
-app.use('/savings', savingsRoutes);
+app.use('/api/income', incomeRoutes);
+app.use('/api/debt', debtRoutes);
+app.use('/api/savings', savingsRoutes);
 app.use('/expenses', expenseRoutes);
 
 app.listen(PORT, () => {
