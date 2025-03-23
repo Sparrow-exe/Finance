@@ -37,6 +37,11 @@ function DashboardPage() {
     setMenuOpen(false);
   };
 
+  const removeWidget = (widgetId) => {
+    setLayout(layout.filter((item) => item.i !== widgetId));
+    setWidgets(widgets.filter((item) => item.i !== widgetId));
+  };
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -96,12 +101,13 @@ function DashboardPage() {
                   to={widget.link}
                   className="no-drag text-sm text-gray-500 hover:text-blue-500"
                   onMouseDown={(e) => e.stopPropagation()}
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <ChevronRight size={16} />
                 </Link>
               </div>
               <div className="p-2 overflow-auto flex-grow">
-                <WidgetComponent />
+                <WidgetComponent onRemove={() => removeWidget(widget.i)} />
               </div>
             </div>
           );
