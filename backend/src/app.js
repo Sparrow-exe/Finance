@@ -23,7 +23,7 @@ app.use(express.json());
 app.use('/api/income', incomeRoutes);
 app.use('/api/debt', debtRoutes);
 app.use('/api/savings', savingsRoutes);
-app.use('/expenses', expenseRoutes);
+app.use('/api/expenses', expenseRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

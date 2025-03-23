@@ -7,7 +7,7 @@ export const getIncomeData = () => apiGet('/income');
 export const createIncomeEntry = (data) => apiPost('/income', data);
 
 // Update an existing income entry
-export const updateIncome = (id, data) => apiPut(`/income/${id}`, data);
+export const updateIncomeEntry = (id, data) => apiPut(`/income/${id}`, data);
 
 // Delete an income entry
-export const deleteIncome = (id) => apiDelete(`/income/${id}`);
+export const deleteIncomeEntry = (id) => apiDelete(`/income/${id}`);

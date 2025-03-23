@@ -1,55 +1,59 @@
 import React, { useEffect, useState } from 'react';
 import {
-  getDebtData,
-  createDebtEntry,
-  updateDebtEntry,
-  deleteDebtEntry
-} from '../api/debt'; // <-- Make sure these API functions exist
+  getIncomeData,
+  createIncomeEntry,
+  updateIncomeEntry,
+  deleteIncomeEntry
+} from '../api/income';
 
-import DebtForm from '../components/debt/DebtForm';
-import DebtEntry from '../components/debt/DebtEntry';
-import DebtAnalysis from '../components/debt/DebtAnalysis';
+import IncomeForm from '../components/incomecalculator/IncomeForm';
+import IncomeEntry from '../components/incomecalculator/IncomeEntry';
+import IncomeAnalysis from '../components/incomecalculator/IncomeAnalysis';
 
-function DebtPage() {
-  const [debts, setDebts] = useState([]);
+function IncomePage() {
+  const [income, setIncome] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingEntry, setEditingEntry] = useState(null);
 
-  const fetchDebts = async () => {
-    const data = await getDebtData();
-    setDebts(data);
+  // Fetch data
+  const fetchIncome = async () => {
+    const data = await getIncomeData();
+    setIncome(data);
   };
 
   useEffect(() => {
-    fetchDebts();
+    fetchIncome();
   }, []);
 
+  // Add entry
   const handleAdd = async (newEntry) => {
-    await createDebtEntry(newEntry);
+    await createIncomeEntry(newEntry);
     setIsAdding(false);
-    fetchDebts();
+    fetchIncome();
   };
 
+  // Edit entry
   const handleEdit = async (updatedEntry) => {
-    await updateDebtEntry(updatedEntry._id, updatedEntry);
+    await updateIncomeEntry(updatedEntry._id, updatedEntry);
     setEditingEntry(null);
-    fetchDebts();
+    fetchIncome();
   };
 
+  // Delete entry
   const handleDelete = async (id) => {
-    await deleteDebtEntry(id);
-    fetchDebts();
+    await deleteIncomeEntry(id);
+    fetchIncome();
   };
 
   return (
     <div className="p-4 space-y-6">
-      <h1 className="text-2xl font-bold">Debt</h1>
+      <h1 className="text-2xl font-bold">Income</h1>
 
-      {/* Debt Entries */}
+      {/* Income Entries */}
       <div className="space-y-4">
-        {debts.map((entry) =>
+        {income.map((entry) =>
           editingEntry && editingEntry._id === entry._id ? (
-            <DebtForm
+            <IncomeForm
               key={entry._id}
               mode="edit"
               initialData={editingEntry}
@@ -57,7 +61,7 @@ function DebtPage() {
               onCancel={() => setEditingEntry(null)}
             />
           ) : (
-            <DebtEntry
+            <IncomeEntry
               key={entry._id}
               entry={entry}
               onEdit={() => setEditingEntry(entry)}
@@ -67,10 +71,10 @@ function DebtPage() {
         )}
       </div>
 
-      {/* Add Debt Entry */}
+      {/* Add Income Entry Button / Form */}
       <div className="pt-4">
         {isAdding ? (
-          <DebtForm
+          <IncomeForm
             mode="create"
             onSubmit={handleAdd}
             onCancel={() => setIsAdding(false)}
@@ -80,15 +84,15 @@ function DebtPage() {
             onClick={() => setIsAdding(true)}
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
-            + Add Debt Entry
+            + Add Income Entry
           </button>
         )}
       </div>
 
-      {/* Analysis Section */}
-      <DebtAnalysis entries={debts} />
+      {/* Income Analysis */}
+      <IncomeAnalysis entries={income} />
     </div>
   );
 }
 
-export default DebtPage;
+export default IncomePage;
