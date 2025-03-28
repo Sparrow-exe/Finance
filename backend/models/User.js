@@ -111,7 +111,6 @@ const WidgetSchema = new Schema({
 const SettingsSchema = new Schema({
   // Account & Security
   email: String,
-  password: String,
   twoFactorEnabled: { type: Boolean, default: false },
   loginAlerts: { type: Boolean, default: true },
   lastLogin: Date,
@@ -146,12 +145,31 @@ const SettingsSchema = new Schema({
   ...commonFields
 });
 
+const RoleSchema = new Schema({
+  role: { type: String, enum: ['user', 'admin', 'moderator'], required: true },
+  assignedAt: { type: Date, default: Date.now },
+  assignedBy: String,
+});
+
+const RefreshTokenSchema = new Schema({
+  token: { type: String, required: true },
+  issuedAt: { type: Date, default: Date.now },
+  lastUsedAt: Date,
+  ip: String,
+  userAgent: String
+});
+
 //
 // 👤 USER SCHEMA
 //
 const UserSchema = new Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  currentRefreshToken: { type: String },
+  previousRefreshTokens: [RefreshTokenSchema],
+
+  // 🔑 Roles
+  RBAC: [RoleSchema],
 
   finances: {
     income: [IncomeSchema],
@@ -163,6 +181,6 @@ const UserSchema = new Schema({
   widgets: [WidgetSchema],
   settings: SettingsSchema
 
-}, { timestamps: true });
+}, { timestamps: true, });
 
 module.exports = mongoose.model('User', UserSchema);

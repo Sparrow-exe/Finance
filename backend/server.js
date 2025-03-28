@@ -26,7 +26,7 @@ app.use(mongoSanitize());
 app.use(xss());
 
 app.use('/api/auth', authRoutes);
-app.get('/refresh', refreshAccessToken); // <- new
+app.post('/refresh', refreshAccessToken); // <- new
 app.use('/api/user', userRoutes);
 
 

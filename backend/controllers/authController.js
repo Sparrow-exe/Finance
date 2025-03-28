@@ -39,6 +39,19 @@ exports.login = async (req, res) => {
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
 
+    
+    // Store the refresh token
+    if (user.currentRefreshToken != null) {
+      user.previousRefreshTokens.push({
+        token: user.currentRefreshToken,
+        lastUsedAt: new Date(),
+        ip: req.ip,
+        userAgent: req.headers['user-agent']
+      });
+    }
+    user.currentRefreshToken = refreshToken;
+    await user.save();
+
     // Send refresh token as HTTP-only cookie
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
