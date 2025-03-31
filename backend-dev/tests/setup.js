@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const app = require('../src/app');
 const request = require('supertest');
 
-require('dotenv').config({ path: '.env.test' });
+require('dotenv').config({ path: '../.env.test' });
 
 let mongoServer;
 

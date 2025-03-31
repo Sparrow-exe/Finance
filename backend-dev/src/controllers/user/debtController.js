@@ -1,43 +1,28 @@
-// controllers/user/debtController.js
-const User = require('../../models/User');
+const finance = require('../../services/userFinanceService');
 
-exports.getDebt = async (req, res) => {
+exports.getDebt = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.id).select('finances.debt');
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    res.json(user.finances.debt);
+    const debt = await finance.getUserField(req.user.id, 'finances.debt');
+    res.json(debt);
   } catch (err) {
-    console.error('Get debt error:', err);
-    res.status(500).json({ message: 'Server error' });
+    next(err);
   }
 };
 
-exports.updateDebt = async (req, res) => {
+exports.updateDebt = async (req, res, next) => {
   try {
-    const updated = await User.findByIdAndUpdate(
-      req.user.id,
-      { $set: { 'finances.debt': req.body } },
-      { new: true }
-    );
-    if (!updated) return res.status(404).json({ message: 'User not found' });
-    res.json(updated.finances.debt);
+    const debt = await finance.updateUserField(req.user.id, 'finances.debt', req.body);
+    res.json(debt);
   } catch (err) {
-    console.error('Update debt error:', err);
-    res.status(500).json({ message: 'Server error' });
+    next(err);
   }
 };
 
-exports.resetDebt = async (req, res) => {
+exports.resetDebt = async (req, res, next) => {
   try {
-    const updated = await User.findByIdAndUpdate(
-      req.user.id,
-      { $set: { 'finances.debt': [] } },
-      { new: true }
-    );
-    if (!updated) return res.status(404).json({ message: 'User not found' });
-    res.json(updated.finances.debt);
+    const debt = await finance.resetUserField(req.user.id, 'finances.debt');
+    res.json(debt);
   } catch (err) {
-    console.error('Reset debt error:', err);
-    res.status(500).json({ message: 'Server error' });
+    next(err);
   }
 };

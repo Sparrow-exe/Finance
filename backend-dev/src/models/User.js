@@ -14,6 +14,12 @@ const UserSchema = new Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
 
+  lockout: {
+    failedAttempts: { type: Number, default: 0 },
+    lockUntil: { type: Date },
+  },
+
+
   currentRefreshToken: { type: String },
   previousRefreshTokens: [RefreshTokenSchema],
   RBAC: [RoleSchema],

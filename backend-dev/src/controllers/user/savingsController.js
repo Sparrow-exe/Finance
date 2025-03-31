@@ -1,43 +1,28 @@
-// controllers/user/savingsController.js
-const User = require('../../models/User');
+const finance = require('../../services/userFinanceService');
 
-exports.getSavings = async (req, res) => {
+exports.getSavings = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.id).select('finances.savings');
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    res.json(user.finances.savings);
+    const savings = await finance.getUserField(req.user.id, 'finances.savings');
+    res.json(savings);
   } catch (err) {
-    console.error('Get savings error:', err);
-    res.status(500).json({ message: 'Server error' });
+    next(err);
   }
 };
 
-exports.updateSavings = async (req, res) => {
+exports.updateSavings = async (req, res, next) => {
   try {
-    const updated = await User.findByIdAndUpdate(
-      req.user.id,
-      { $set: { 'finances.savings': req.body } },
-      { new: true }
-    );
-    if (!updated) return res.status(404).json({ message: 'User not found' });
-    res.json(updated.finances.savings);
+    const savings = await finance.updateUserField(req.user.id, 'finances.savings', req.body);
+    res.json(savings);
   } catch (err) {
-    console.error('Update savings error:', err);
-    res.status(500).json({ message: 'Server error' });
+    next(err);
   }
 };
 
-exports.resetSavings = async (req, res) => {
+exports.resetSavings = async (req, res, next) => {
   try {
-    const updated = await User.findByIdAndUpdate(
-      req.user.id,
-      { $set: { 'finances.savings': [] } },
-      { new: true }
-    );
-    if (!updated) return res.status(404).json({ message: 'User not found' });
-    res.json(updated.finances.savings);
+    const savings = await finance.resetUserField(req.user.id, 'finances.savings');
+    res.json(savings);
   } catch (err) {
-    console.error('Reset savings error:', err);
-    res.status(500).json({ message: 'Server error' });
+    next(err);
   }
 };

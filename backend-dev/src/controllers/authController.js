@@ -1,52 +1,36 @@
-const User = require('../models/User');
-const {
-  generateAccessToken,
-  generateRefreshToken,
-} = require('../utils/tokenUtils');
-const {
-  hashPassword,
-  comparePassword,
-} = require('../utils/authUtils');
+const { registerUser, loginUser, logoutUser } = require('../services/authService');
 const { refreshCookieOptions } = require('../utils/cookieUtils');
-const { archiveRefreshToken } = require('../utils/tokenRotation');
 
-exports.register = async (req, res) => {
-  const { email, password } = req.body;
+exports.register = async (req, res, next) => {
   try {
-    const exists = await User.findOne({ email });
-    if (exists) return res.status(400).json({ message: 'Email already in use' });
-
-    const hashed = await hashPassword(password);
-    const newUser = new User({ email, password: hashed });
-    await newUser.save();
-
-    res.status(201).json({ message: 'User registered' });
+    const result = await registerUser(req.body.email, req.body.password);
+    res.status(201).json(result);
   } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+    next(err);
   }
 };
 
-exports.login = async (req, res) => {
-  const { email, password } = req.body;
+exports.login = async (req, res, next) => {
   try {
-    const user = await User.findOne({ email });
-    if (!user || !(await comparePassword(password, user.password))) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
-
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
-
-    // Rotate refresh token
-    if (user.currentRefreshToken) {
-      archiveRefreshToken(user, req);
-    }
-    user.currentRefreshToken = refreshToken;
-    await user.save();
-
-    res.cookie('refreshToken', refreshToken, refreshCookieOptions);
-    res.json({ accessToken, user: { id: user._id, email: user.email } });
+    const { email, password } = req.body;
+    const result = await loginUser(email, password, req);
+    res.cookie('refreshToken', result.refreshToken, refreshCookieOptions);
+    res.json({ accessToken: result.accessToken, user: result.user });
   } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+    next(err);
+  }
+};
+
+exports.logout = async (req, res, next) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    const authHeader = req.headers.authorization;
+    const accessToken = authHeader?.split(' ')[1];
+
+    const result = await logoutUser(accessToken, refreshToken, req);
+    res.clearCookie('refreshToken', refreshCookieOptions);
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
   }
 };

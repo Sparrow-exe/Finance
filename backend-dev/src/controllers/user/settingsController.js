@@ -1,44 +1,32 @@
-// controllers/user/settingsController.js
-const User = require('../../models/User');
+const finance = require('../../services/userFinanceService');
 
-exports.getSettings = async (req, res) => {
+exports.getSettings = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.id).select('settings');
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    res.json(user.settings);
+    const settings = await finance.getUserField(req.user.id, 'settings');
+    res.json(settings);
   } catch (err) {
-    console.error('Get settings error:', err);
-    res.status(500).json({ message: 'Server error' });
+    next(err);
   }
 };
 
-exports.updateSettings = async (req, res) => {
+exports.updateSettings = async (req, res, next) => {
   try {
-    const updated = await User.findByIdAndUpdate(
-      req.user.id,
-      { $set: { settings: { ...req.body, dateUpdated: new Date() } } },
-      { new: true }
-    );
-    if (!updated) return res.status(404).json({ message: 'User not found' });
-    res.json(updated.settings);
+    const updated = await finance.updateUserField(req.user.id, 'settings', {
+      ...req.body,
+      dateUpdated: new Date()
+    });
+    res.json(updated);
   } catch (err) {
-    console.error('Update settings error:', err);
-    res.status(500).json({ message: 'Server error' });
+    next(err);
   }
 };
 
-exports.resetSettings = async (req, res) => {
+exports.resetSettings = async (req, res, next) => {
   try {
-    const defaultSettings = {}; // optionally preload defaults here
-    const updated = await User.findByIdAndUpdate(
-      req.user.id,
-      { $set: { settings: defaultSettings } },
-      { new: true }
-    );
-    if (!updated) return res.status(404).json({ message: 'User not found' });
-    res.json(updated.settings);
+    const defaultSettings = {}; // or populate with actual defaults
+    const reset = await finance.resetUserField(req.user.id, 'settings', defaultSettings);
+    res.json(reset);
   } catch (err) {
-    console.error('Reset settings error:', err);
-    res.status(500).json({ message: 'Server error' });
+    next(err);
   }
 };

@@ -13,9 +13,26 @@ middleware.use(
     credentials: true,
   })
 );
+
 middleware.use(express.json());
 middleware.use(cookieParser());
-middleware.use(helmet());
+middleware.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:"],
+        connectSrc: ["'self'", "http://localhost:3001"],
+        fontSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests: [],
+      },
+    },
+  })
+);
+
 middleware.use(mongoSanitize());
 middleware.use(xss());
 

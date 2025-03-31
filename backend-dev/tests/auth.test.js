@@ -2,9 +2,10 @@ const request = require('supertest');
 const app = require('../src/app'); // Your Express app
 const mongoose = require('mongoose');
 const User = require('../src/models/User');
-require('dotenv').config({ path: '.env.test' });
+require('dotenv').config({ path: '../.env.test' });
 
 beforeAll(async () => {
+  console.log(process.env.MONGO_URI)
   await mongoose.connect(process.env.MONGO_URI);
 });
 
@@ -55,4 +56,33 @@ describe('Auth Routes', () => {
     expect(res.statusCode).toBe(400);
     expect(res.body.message).toMatch(/Invalid/);
   });
+
+  it('should blacklist access token upon logout', async () => {
+    const loginRes = await request(app).post('/api/auth/login').send({
+      email: testEmail,
+      password: testPassword,
+    });
+  
+    const accessToken = loginRes.body.accessToken;
+    const cookies = loginRes.headers['set-cookie'];
+  
+    // logout
+    const logoutRes = await request(app)
+      .post('/api/auth/logout')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Cookie', cookies);
+  
+    expect(logoutRes.statusCode).toBe(200);
+    expect(logoutRes.body.message).toMatch(/Logged out successfully/);
+  
+    // verify token is revoked
+    const protectedRes = await request(app)
+      .get('/api/auth/protected')
+      .set('Authorization', `Bearer ${accessToken}`);
+  
+    expect(protectedRes.statusCode).toBe(401);
+    expect(protectedRes.body.message).toBe('Access token revoked');
+  });
+  
 });
+
