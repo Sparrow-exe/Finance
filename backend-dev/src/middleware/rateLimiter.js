@@ -5,7 +5,7 @@ const slowDown = require('express-slow-down'); // Optional: gradually slow brute
 // Middleware: limit login attempts per IP
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5,
+  max: 10,
   message: {
     message: 'Too many login attempts from this IP. Try again later.',
   },

@@ -27,6 +27,9 @@
   "scripts": {
     "dev": "npx nodemon main"
   },
+  "jest": {
+    "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"]
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

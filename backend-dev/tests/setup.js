@@ -1,18 +1,18 @@
 // tests/setup.js
 const mongoose = require('mongoose');
-const app = require('../src/app');
-const request = require('supertest');
+require('dotenv').config({path: '../.env.test'})
 
-require('dotenv').config({ path: '../.env.test' });
-
-let mongoServer;
 
 beforeAll(async () => {
-  await mongoose.connect(process.env.MONGO_URI);
+  // Connect to your test MongoDB database
+  await mongoose.connect('mongodb://localhost:27017/test-db', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
 });
 
 afterAll(async () => {
+  // Clean up: drop the database and close connection
+  //await mongoose.connection.db.dropDatabase();
   await mongoose.connection.close();
 });
-
-module.exports = request(app);

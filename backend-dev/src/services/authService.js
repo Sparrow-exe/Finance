@@ -20,7 +20,7 @@ exports.loginUser = async (email, password, req) => {
   if (!user) throw createError(400, 'Invalid credentials');
 
   if (user.lockout?.lockUntil && user.lockout.lockUntil > Date.now()) {
-    throw createError(403, 'Account temporarily locked. Try again later.');
+    throw createError(429, 'Account temporarily locked. Try again later.');
   }
 
   const isValid = await comparePassword(password, user.password);

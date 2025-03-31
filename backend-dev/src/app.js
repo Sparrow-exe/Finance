@@ -5,6 +5,7 @@ const userRoutes = require('./routes/userRoutes');
 const verifyToken = require('./middleware/auth');
 const globalMiddleware = require('./middleware');
 require('./utils/securityAlertHandler');
+const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.get('/', (req, res) => {
   res.send('OK');
 });
 
+app.use(errorHandler);
 
 
 module.exports = app;
